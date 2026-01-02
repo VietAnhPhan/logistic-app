@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\SenderRegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -56,4 +57,17 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+});
+
+// Routes for SENDERS
+Route::prefix('senders')->group(function () {
+    // Registration route for senders
+    Route::get('register', [SenderRegisteredUserController::class, 'create']);
+
+    Route::post('register', [SenderRegisteredUserController::class, 'store'])->name('senders.register');
+
+    // Login route for senders
+    Route::get('login', [AuthenticatedSessionController::class, 'createSender']);
+
+    Route::post('login', [AuthenticatedSessionController::class, 'storeSender']);
 });
