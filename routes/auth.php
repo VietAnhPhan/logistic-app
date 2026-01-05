@@ -8,7 +8,8 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\SenderRegisteredUserController;
+use App\Http\Controllers\Auth\Sender\SenderRegisteredUserController;
+use App\Http\Controllers\Auth\Sender\SenderAuthenticatedSessionController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -60,14 +61,19 @@ Route::middleware('auth')->group(function () {
 });
 
 // Routes for SENDERS
-Route::prefix('senders')->group(function () {
+Route::prefix('senders')->middleware('guest')->group(function () {
     // Registration route for senders
-    Route::get('register', [SenderRegisteredUserController::class, 'create']);
+    Route::get('register', [SenderRegisteredUserController::class, 'create'])->name('sender.register');
 
-    Route::post('register', [SenderRegisteredUserController::class, 'store'])->name('senders.register');
+    Route::post('register', [SenderRegisteredUserController::class, 'store']);
 
     // Login route for senders
-    Route::get('login', [AuthenticatedSessionController::class, 'createSender']);
+    Route::get('login', [SenderAuthenticatedSessionController::class, 'create'])->name('sender.login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'storeSender']);
+    Route::post('login', [SenderAuthenticatedSessionController::class, 'store']);
+});
+
+Route::middleware('auth:sender')->group(function () {
+    Route::post('senders/logout', [SenderAuthenticatedSessionController::class, 'destroy'])
+        ->name('sender.logout');
 });

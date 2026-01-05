@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Auth\Sender;
 
 use App\Http\Controllers\Controller;
 use App\Services\SenderService;
@@ -34,23 +34,16 @@ class SenderRegisteredUserController extends Controller
         $validate = $request->validate([
             'company_name' => 'required|string|max:255',
             'mobile' => 'required|string|max:20',
-            'contact_email' => 'required|email|max:255|unique:users,email',
+            'contact_email' => 'required|email|max:255|unique:senders,email',
             'address' => 'required|string|max:500',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-
-        // // Create the sender user
-        // $user = \App\Models\User::create([
-        //     'name' => $request->company_name,
-        //     'email' => $request->contact_email,
-        //     'password' => bcrypt($request->password),
-        //     'role' => 'sender',
-        // ]);
-
         $sender = $this->senderService->register($validate);
+
+
         // // Log the user in
-        Auth::login($sender);
+        Auth::guard('sender')->login($sender);
 
         // // Redirect to sender dashboard or intended page
         return redirect()->route('sender.dashboard');
